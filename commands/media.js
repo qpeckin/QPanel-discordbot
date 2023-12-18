@@ -4,31 +4,44 @@ const {
   ActionRowBuilder,
 } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
+const axios = require("axios");
+const https = require("https");
 
 const buttons = {
   instagram: new ButtonBuilder()
-    .setCustomId("insta")
+    .setCustomId("Instagram")
     .setLabel("Instagram")
     .setStyle(1),
+
   youtube: new ButtonBuilder()
-    .setCustomId("youtube")
+    .setCustomId("Youtube")
     .setLabel("Youtube")
     .setStyle(1),
-  likes: new ButtonBuilder().setCustomId("likes").setLabel("Likes").setStyle(1),
+
+  likes: new ButtonBuilder().setCustomId("Likes").setLabel("Likes").setStyle(1),
+
   followers: new ButtonBuilder()
-    .setCustomId("followers")
+    .setCustomId("Followers")
     .setLabel("Followers")
     .setStyle(1),
-  views: new ButtonBuilder().setCustomId("views").setLabel("Views").setStyle(1),
+
+  views: new ButtonBuilder().setCustomId("Views").setLabel("Views").setStyle(1),
+
   100: new ButtonBuilder().setCustomId("100").setLabel("100").setStyle(1),
+
   200: new ButtonBuilder().setCustomId("200").setLabel("200").setStyle(1),
+
   300: new ButtonBuilder().setCustomId("300").setLabel("300").setStyle(1),
+
   500: new ButtonBuilder().setCustomId("500").setLabel("500").setStyle(1),
+
   1000: new ButtonBuilder().setCustomId("1000").setLabel("1000").setStyle(1),
 };
 
 module.exports = {
-  data: new SlashCommandBuilder().setName("media").setDescription("btn"),
+  data: new SlashCommandBuilder()
+    .setName("media")
+    .setDescription("Order a media service."),
   async execute(client, interaction) {
     let selectedMedia = null;
     let selectedService = null;
@@ -53,13 +66,13 @@ module.exports = {
 
     const filter = (i) => {
       if (i.user.id === interaction.user.id) {
-        if (["insta", "youtube"].includes(i.customId)) {
+        if (["Instagram", "Youtube"].includes(i.customId)) {
           return true;
         } else if (
           [
-            "likes",
-            "followers",
-            "views",
+            "Likes",
+            "Followers",
+            "Views",
             "100",
             "200",
             "300",
@@ -75,16 +88,16 @@ module.exports = {
 
     const collector = message.createMessageComponentCollector({
       filter,
-      time: 15000,
+      time: 150000,
     });
 
     collector.on("collect", async (i) => {
       try {
-        if (i.customId === "insta" || i.customId === "youtube") {
+        if (i.customId === "Instagram" || i.customId === "Youtube") {
           selectedMedia = i.customId;
 
           const serviceButtons = [buttons.likes, buttons.followers];
-          if (i.customId === "youtube") {
+          if (i.customId === "Youtube") {
             serviceButtons.push(buttons.views);
           }
 
@@ -105,7 +118,7 @@ module.exports = {
             components: [serviceActionRow],
             ephemeral: true,
           });
-        } else if (["likes", "followers", "views"].includes(i.customId)) {
+        } else if (["Likes", "Followers", "Views"].includes(i.customId)) {
           selectedService = i.customId;
 
           const quantityButtons = [
@@ -153,10 +166,45 @@ module.exports = {
           const collector = i.channel.createMessageCollector({
             filter,
             max: 1,
-            time: 15000,
+            time: 150000,
           });
 
           collector.on("collect", (m) => {
+            const data = {
+              media: selectedMedia,
+              services: selectedService,
+              link: m.content,
+              number: selectedQuantity,
+            };
+
+            axios
+              .post("https://127.0.0.1:8000/api/media", data, {
+                headers: {
+                  Authorization: interaction.user.id,
+                },
+                httpsAgent: new https.Agent({
+                  rejectUnauthorized: false,
+                }),
+              })
+              .then((response) => {
+                console.log("response: " + response.data.message);
+              })
+              .catch((error) => {
+                console.error("Error in Axios request:", error.message);
+                if (error.response) {
+                  console.error("Response data:", error.response.data);
+                  console.error("Response status:", error.response.status);
+                  console.error("Response headers:", error.response.headers);
+                } else if (error.request) {
+                  console.error(
+                    "No response received. Request details:",
+                    error.request
+                  );
+                } else {
+                  console.error("Error setting up the request:", error.message);
+                }
+              });
+
             const embed = new EmbedBuilder()
               .setColor("#b300ff")
               .setTitle("Order Confirmation")

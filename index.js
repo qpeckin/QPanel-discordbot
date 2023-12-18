@@ -12,6 +12,20 @@ LoadCommands()
   .then(() => {
     client.on("interactionCreate", (interaction) => {
       if (!interaction.isCommand()) return;
+
+      try {
+        require(`./commands/${interaction.commandName}`);
+      } catch (error) {
+        if (error.code === "MODULE_NOT_FOUND") {
+          interaction.reply({
+            content: "Command not found, try /help",
+            ephemeral: true,
+          });
+          return;
+        }
+        throw error;
+      }
+
       require(`./commands/${interaction.commandName}`).execute(
         client,
         interaction
