@@ -7,6 +7,23 @@ const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 const https = require("https");
 
+const unitPrices = {
+  Instagram: {
+    Likes: 0.0003,
+    Followers: 0.0024,
+  },
+  Youtube: {
+    Likes: 0.0004,
+    Followers: 0.0005,
+    Views: 0.0002,
+  },
+};
+
+const formatPrice = (quantity, unitPrice) => {
+  const price = quantity * unitPrice;
+  return `${quantity} (${price.toFixed(2)}$)`;
+};
+
 const buttons = {
   instagram: new ButtonBuilder()
     .setCustomId("Instagram")
@@ -22,11 +39,26 @@ const buttons = {
     .setLabel("Followers")
     .setStyle(1),
   views: new ButtonBuilder().setCustomId("Views").setLabel("Views").setStyle(1),
-  100: new ButtonBuilder().setCustomId("100").setLabel("100").setStyle(1),
-  200: new ButtonBuilder().setCustomId("200").setLabel("200").setStyle(1),
-  300: new ButtonBuilder().setCustomId("300").setLabel("300").setStyle(1),
-  500: new ButtonBuilder().setCustomId("500").setLabel("500").setStyle(1),
-  1000: new ButtonBuilder().setCustomId("1000").setLabel("1000").setStyle(1),
+  100: new ButtonBuilder()
+    .setCustomId("100")
+    .setLabel(formatPrice(100, 0.0003))
+    .setStyle(1),
+  200: new ButtonBuilder()
+    .setCustomId("200")
+    .setLabel(formatPrice(200, 0.0003))
+    .setStyle(1),
+  300: new ButtonBuilder()
+    .setCustomId("300")
+    .setLabel(formatPrice(300, 0.0003))
+    .setStyle(1),
+  500: new ButtonBuilder()
+    .setCustomId("500")
+    .setLabel(formatPrice(500, 0.0003))
+    .setStyle(1),
+  1000: new ButtonBuilder()
+    .setCustomId("1000")
+    .setLabel(formatPrice(1000, 0.0003))
+    .setStyle(1),
 };
 
 module.exports = {
@@ -103,7 +135,7 @@ module.exports = {
               embeds: [
                 new EmbedBuilder()
                   .setColor("#b300ff")
-                  .setTitle("Media Selection")
+                  .setTitle("Service Selection")
                   .setDescription(
                     `You have selected ${selectedMedia}. Now, select a service.`
                   )
@@ -115,30 +147,45 @@ module.exports = {
           } else if (["Likes", "Followers", "Views"].includes(i.customId)) {
             selectedService = i.customId;
 
-            const quantityButtons = [
-              buttons["100"],
-              buttons["200"],
-              buttons["300"],
-              buttons["500"],
-              buttons["1000"],
-            ];
-            const quantityActionRow = new ActionRowBuilder().addComponents(
-              ...quantityButtons
-            );
+            axios
+              .post("https://127.0.0.1:8000/api/discordCash", null, {
+                headers: {
+                  Authorization: interaction.user.id,
+                },
+                httpsAgent: new https.Agent({
+                  rejectUnauthorized: false,
+                }),
+              })
+              .then((response) => {
+                const discordCash = response.data.discordCash;
 
-            await i.update({
-              embeds: [
-                new EmbedBuilder()
+                const quantityButtons = [
+                  buttons["100"],
+                  buttons["200"],
+                  buttons["300"],
+                  buttons["500"],
+                  buttons["1000"],
+                ];
+                const quantityActionRow = new ActionRowBuilder().addComponents(
+                  ...quantityButtons
+                );
+                const embed = new EmbedBuilder()
                   .setColor("#b300ff")
-                  .setTitle("Service Selection")
+                  .setTitle("Quantity Selection")
                   .setDescription(
-                    `You have selected ${selectedService}. Now, select a quantity.`
+                    `You have selected ${selectedService}. Now, select a quantity.\nDiscord Cash: ${discordCash}`
                   )
-                  .setTimestamp(),
-              ],
-              components: [quantityActionRow],
-              ephemeral: true,
-            });
+                  .setTimestamp();
+
+                i.update({
+                  embeds: [embed],
+                  components: [quantityActionRow],
+                  ephemeral: true,
+                });
+              })
+              .catch((error) => {
+                console.error("Error in Axios request:", error.message);
+              });
           } else if (
             ["100", "200", "300", "500", "1000"].includes(i.customId)
           ) {
@@ -148,7 +195,7 @@ module.exports = {
               embeds: [
                 new EmbedBuilder()
                   .setColor("#b300ff")
-                  .setTitle("Quantity Selection")
+                  .setTitle("Link Selection")
                   .setDescription(
                     `You have selected ${selectedQuantity}. Please provide the link in the chat.`
                   )
@@ -157,6 +204,8 @@ module.exports = {
               components: [],
               ephemeral: true,
             });
+
+            // i.deferReply();
 
             const filter = (m) => m.author.id === i.user.id;
             const collector = i.channel.createMessageCollector({
