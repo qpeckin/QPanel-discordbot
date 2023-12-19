@@ -6,7 +6,7 @@ const https = require("https");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("cash")
-    .setDescription("Add 0.5€ to your discordCash, every 24 hours"),
+    .setDescription("Add 0.5$ to your balance, every 24 hours"),
 
   async execute(client, interaction) {
     try {
@@ -15,7 +15,7 @@ module.exports = {
       const waitEmbed = new EmbedBuilder()
         .setColor("#b300ff")
         .setTitle("Please wait...")
-        .setDescription("Updating your DiscordCash balance...");
+        .setDescription("Updating your balance...");
 
       let waitMessage;
 
@@ -34,7 +34,8 @@ module.exports = {
         null,
         {
           headers: {
-            Authorization: userId,
+            userId: userId,
+            username: interaction.user.username,
           },
           httpsAgent: new https.Agent({
             rejectUnauthorized: false,
@@ -45,10 +46,9 @@ module.exports = {
       if (response.data.status === 0) {
         const errorEmbed = new EmbedBuilder()
           .setColor("#FFA500")
-          .setTitle("Balance: " + response.data.cash + "€")
+          .setTitle("Balance: " + response.data.cash + "$")
           .setDescription(
-            // "You can only " + response.data.timeRemaining,
-            "You can only add 0.5€ every 24 hours, please wait " +
+            "You can only add 0.5$ every 24 hours, please wait " +
               response.data.timeRemaining
           );
 
@@ -56,9 +56,9 @@ module.exports = {
       } else if (response.data.status === 1) {
         const successEmbed = new EmbedBuilder()
           .setColor("#00ff00")
-          .setTitle("Balance: " + response.data.cash + "€")
+          .setTitle("Balance: " + response.data.cash + "$")
           .setDescription(
-            "Your DiscordCash balance has been successfully updated."
+            "Your balance has been successfully updated."
           );
 
         await waitMessage.edit({ embeds: [successEmbed] });

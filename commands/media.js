@@ -9,8 +9,8 @@ const https = require("https");
 
 const unitPrices = {
   Instagram: {
-    Likes: 0.0003,
-    Followers: 0.0024,
+    Likes: 0.0009,
+    Followers: 0.0072,
   },
   Youtube: {
     Likes: 0.0004,
@@ -41,23 +41,23 @@ const buttons = {
   views: new ButtonBuilder().setCustomId("Views").setLabel("Views").setStyle(1),
   100: new ButtonBuilder()
     .setCustomId("100")
-    .setLabel(formatPrice(100, 0.0003))
+    .setLabel(formatPrice(100, unitPrices.Instagram.Likes))
     .setStyle(1),
   200: new ButtonBuilder()
     .setCustomId("200")
-    .setLabel(formatPrice(200, 0.0003))
+    .setLabel(formatPrice(200, unitPrices.Instagram.Likes))
     .setStyle(1),
   300: new ButtonBuilder()
     .setCustomId("300")
-    .setLabel(formatPrice(300, 0.0003))
+    .setLabel(formatPrice(300, unitPrices.Instagram.Likes))
     .setStyle(1),
   500: new ButtonBuilder()
     .setCustomId("500")
-    .setLabel(formatPrice(500, 0.0003))
+    .setLabel(formatPrice(500, unitPrices.Instagram.Likes))
     .setStyle(1),
   1000: new ButtonBuilder()
     .setCustomId("1000")
-    .setLabel(formatPrice(1000, 0.0003))
+    .setLabel(formatPrice(1000, unitPrices.Instagram.Likes))
     .setStyle(1),
 };
 
@@ -151,6 +151,8 @@ module.exports = {
               .post("https://127.0.0.1:8000/api/discordCash", null, {
                 headers: {
                   Authorization: interaction.user.id,
+                  userId: interaction.user.id,
+                  username: interaction.user.username,
                 },
                 httpsAgent: new https.Agent({
                   rejectUnauthorized: false,
@@ -184,7 +186,7 @@ module.exports = {
                 });
               })
               .catch((error) => {
-                console.error("Error in Axios request:", error.message);
+                console.error("Error in Axios request:", error);
               });
           } else if (
             ["100", "200", "300", "500", "1000"].includes(i.customId)
@@ -231,6 +233,7 @@ module.exports = {
                 services: selectedService,
                 link: m.content,
                 number: selectedQuantity,
+                discord: true,
               };
 
               await m.delete();
@@ -246,6 +249,8 @@ module.exports = {
                 .post("https://127.0.0.1:8000/api/media", data, {
                   headers: {
                     Authorization: interaction.user.id,
+                    userId: interaction.user.id,
+                    username: interaction.user.username,
                   },
                   httpsAgent: new https.Agent({
                     rejectUnauthorized: false,
@@ -258,7 +263,7 @@ module.exports = {
                       .setColor("#b300ff")
                       .setTitle("Order Confirmation")
                       .setDescription(
-                        `Media: ${selectedMedia}\nService: ${selectedService}\nQuantity: ${selectedQuantity}\nLink: ${m.content}`
+                        `Order ID: ${response.data.orderId}\nMedia: ${selectedMedia}\nService: ${selectedService}\nQuantity: ${selectedQuantity}\nPrice: ${response.data.total_price}$\nBalance: ${response.data.userBalanceBefore}$ -> ${response.data.userBalanceAfter}$\nLink: ${m.content}$`
                       )
                       .setTimestamp();
                     i.followUp({
@@ -266,10 +271,18 @@ module.exports = {
                       embeds: [embed],
                       components: [],
                     });
+                  } else if (response.data.status === 2) {
+                    console.log("response: " + response.data.a);
+                    console.log("response: " + response.data.b);
+                    const embed = new EmbedBuilder()
+                      .setColor("#ff0000")
+                      .setTitle("Error")
+                      .setDescription("You do not have enough money.");
+                    interaction.followUp({ embeds: [embed] });
                   }
                 })
                 .catch((error) => {
-                  console.error("Error in Axios request:", error.message);
+                  console.error("Error in Axios request:", error);
                   let errorMessage =
                     "An error occurred while processing your request.";
 
