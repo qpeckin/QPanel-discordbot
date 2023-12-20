@@ -17,13 +17,12 @@ module.exports = {
         .setDescription("The action to perform")
         .setRequired(true)
         .addChoices(
-          { name: "List", value: "list" },
-          { name: "Info", value: "info" }
+          { name: "list", value: "list" },
+          { name: "info", value: "info" }
         )
     ),
   async execute(client, interaction) {
     const action = interaction.options.getString("action");
-    console.log(action);
     if (action === "list") {
       const loadingEmbed = new EmbedBuilder()
         .setTitle("Loading...")
@@ -34,7 +33,6 @@ module.exports = {
         .reply({ embeds: [loadingEmbed], fetchReply: true })
         .then(async (loadingMessage) => {
           const userId = interaction.user.id;
-          console.log(userId);
           try {
             const response = await axios.post(
               "https://127.0.0.1:8000/api/getOrders",

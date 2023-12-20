@@ -7,17 +7,26 @@ const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 const https = require("https");
 
-const unitPrices = {
-  Instagram: {
-    Likes: 0.0009,
-    Followers: 0.0072,
-  },
-  Youtube: {
-    Likes: 0.0004,
-    Followers: 0.0005,
-    Views: 0.0002,
-  },
+let unitPrices = null;
+
+const updatePrices = async () => {
+  try {
+    const response = await axios.post(
+      "https://127.0.0.1:8000/api/mediaPrices",
+      null,
+      {
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false,
+        }),
+      }
+    );
+    unitPrices = response.data;
+  } catch (error) {
+    console.error("Error updating prices:", error);
+  }
 };
+
+updatePrices();
 
 const formatPrice = (quantity, unitPrice) => {
   const price = quantity * unitPrice;
@@ -33,32 +42,25 @@ const buttons = {
     .setCustomId("Youtube")
     .setLabel("Youtube")
     .setStyle(1),
+  tiktok: new ButtonBuilder()
+    .setCustomId("Tiktok")
+    .setLabel("Tiktok")
+    .setStyle(1),
+  twitter: new ButtonBuilder()
+    .setCustomId("Twitter")
+    .setLabel("Twitter")
+    .setStyle(1),
   likes: new ButtonBuilder().setCustomId("Likes").setLabel("Likes").setStyle(1),
   followers: new ButtonBuilder()
     .setCustomId("Followers")
     .setLabel("Followers")
     .setStyle(1),
   views: new ButtonBuilder().setCustomId("Views").setLabel("Views").setStyle(1),
-  100: new ButtonBuilder()
-    .setCustomId("100")
-    .setLabel(formatPrice(100, unitPrices.Instagram.Likes))
-    .setStyle(1),
-  200: new ButtonBuilder()
-    .setCustomId("200")
-    .setLabel(formatPrice(200, unitPrices.Instagram.Likes))
-    .setStyle(1),
-  300: new ButtonBuilder()
-    .setCustomId("300")
-    .setLabel(formatPrice(300, unitPrices.Instagram.Likes))
-    .setStyle(1),
-  500: new ButtonBuilder()
-    .setCustomId("500")
-    .setLabel(formatPrice(500, unitPrices.Instagram.Likes))
-    .setStyle(1),
-  1000: new ButtonBuilder()
-    .setCustomId("1000")
-    .setLabel(formatPrice(1000, unitPrices.Instagram.Likes))
-    .setStyle(1),
+  100: new ButtonBuilder().setCustomId("100").setLabel("100").setStyle(1),
+  200: new ButtonBuilder().setCustomId("200").setLabel("200").setStyle(1),
+  300: new ButtonBuilder().setCustomId("300").setLabel("300").setStyle(1),
+  500: new ButtonBuilder().setCustomId("500").setLabel("500").setStyle(1),
+  1000: new ButtonBuilder().setCustomId("1000").setLabel("1000").setStyle(1),
 };
 
 module.exports = {
@@ -74,7 +76,9 @@ module.exports = {
 
       const initialActionRow = new ActionRowBuilder().addComponents(
         buttons.instagram,
-        buttons.youtube
+        buttons.youtube,
+        buttons.tiktok,
+        buttons.twitter
       );
 
       const message = await interaction.reply({
@@ -92,7 +96,9 @@ module.exports = {
 
       const filter = (i) => {
         if (i.user.id === interaction.user.id) {
-          if (["Instagram", "Youtube"].includes(i.customId)) {
+          if (
+            ["Instagram", "Youtube", "Tiktok", "Twitter"].includes(i.customId)
+          ) {
             return true;
           } else if (
             [
@@ -119,11 +125,13 @@ module.exports = {
 
       collector.on("collect", async (i) => {
         try {
-          if (i.customId === "Instagram" || i.customId === "Youtube") {
+          if (
+            ["Instagram", "Youtube", "Tiktok", "Twitter"].includes(i.customId)
+          ) {
             selectedMedia = i.customId;
 
             const serviceButtons = [buttons.likes, buttons.followers];
-            if (i.customId === "Youtube") {
+            if (["Youtube", "Tiktok", "Twitter"].includes(i.customId)) {
               serviceButtons.push(buttons.views);
             }
 
@@ -147,6 +155,8 @@ module.exports = {
           } else if (["Likes", "Followers", "Views"].includes(i.customId)) {
             selectedService = i.customId;
 
+            const unitPrice = unitPrices[selectedMedia][selectedService];
+
             axios
               .post("https://127.0.0.1:8000/api/discordCash", null, {
                 headers: {
@@ -160,14 +170,16 @@ module.exports = {
               })
               .then((response) => {
                 const discordCash = response.data.discordCash;
+                const quantityOptions = [100, 200, 300, 500, 1000];
+                const quantityButtons = quantityOptions.map((quantity) => {
+                  const label = formatPrice(quantity, unitPrice);
+                  const customId = quantity.toString();
+                  return new ButtonBuilder()
+                    .setCustomId(customId)
+                    .setLabel(label)
+                    .setStyle(1);
+                });
 
-                const quantityButtons = [
-                  buttons["100"],
-                  buttons["200"],
-                  buttons["300"],
-                  buttons["500"],
-                  buttons["1000"],
-                ];
                 const quantityActionRow = new ActionRowBuilder().addComponents(
                   ...quantityButtons
                 );
@@ -207,13 +219,11 @@ module.exports = {
               ephemeral: true,
             });
 
-            // i.deferReply();
-
             const filter = (m) => m.author.id === i.user.id;
             const collector = i.channel.createMessageCollector({
               filter,
               max: 1,
-              time: 150000,
+              time: 15000,
             });
 
             collector.on("collect", async (m) => {
