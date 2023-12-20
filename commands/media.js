@@ -175,7 +175,7 @@ module.exports = {
                   .setColor("#b300ff")
                   .setTitle("Quantity Selection")
                   .setDescription(
-                    `You have selected ${selectedService}. Now, select a quantity.\nDiscord Cash: ${discordCash}`
+                    `You have selected ${selectedService}. Now, select a quantity.\nBalance: ${discordCash}`
                   )
                   .setTimestamp();
 

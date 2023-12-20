@@ -57,21 +57,17 @@ module.exports = {
         const successEmbed = new EmbedBuilder()
           .setColor("#00ff00")
           .setTitle("Balance: " + response.data.cash + "$")
-          .setDescription(
-            "Your balance has been successfully updated."
-          );
+          .setDescription("Your balance has been successfully updated.");
 
         await waitMessage.edit({ embeds: [successEmbed] });
       }
     } catch (error) {
-      console.error("Error while updating DiscordCash", error);
+      console.error("Error while updating balance", error);
 
       const errorEmbed = new EmbedBuilder()
         .setColor("#ff0000")
         .setTitle("Error")
-        .setDescription(
-          "An error occurred while updating your DiscordCash balance."
-        );
+        .setDescription("An error occurred while updating your balance.");
 
       await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
     }
