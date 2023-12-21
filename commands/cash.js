@@ -56,8 +56,8 @@ module.exports = {
       } else if (response.data.status === 1) {
         const successEmbed = new EmbedBuilder()
           .setColor("#00ff00")
-          .setTitle("Balance: " + response.data.cash + "$")
-          .setDescription("Your balance has been successfully updated.");
+          .setTitle("Balance: " + response.data.oldCash + "$ --> " + response.data.cash + "$")
+          .setDescription("Your balance has been successfully updated.\n");
 
         await waitMessage.edit({ embeds: [successEmbed] });
       }

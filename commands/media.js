@@ -32,7 +32,6 @@ const formatPrice = (quantity, unitPrice) => {
   const price = quantity * unitPrice;
   return `${quantity} (${price.toFixed(2)}$)`;
 };
-
 const buttons = {
   instagram: new ButtonBuilder()
     .setCustomId("Instagram")
@@ -187,7 +186,7 @@ module.exports = {
                   .setColor("#b300ff")
                   .setTitle("Quantity Selection")
                   .setDescription(
-                    `You have selected ${selectedService}. Now, select a quantity.\nBalance: ${discordCash}`
+                    `You have selected ${selectedMedia} ${selectedService}. Now, select a quantity.\nBalance: ${discordCash}`
                   )
                   .setTimestamp();
 

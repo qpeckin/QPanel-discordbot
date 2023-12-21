@@ -33,7 +33,8 @@ LoadCommands()
     });
 
     client.on("ready", () => {
-      console.log("I am ready!");
+      console.log("READY");
+      client.user.setActivity('/help');
     });
 
     // client.on("messageCreate", async (message) => {
