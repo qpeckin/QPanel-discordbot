@@ -13,6 +13,7 @@ module.exports = {
     commands += "**/media** - Add an media order\n\n";
     commands += "**/order list** - Get your order list\n\n";
     commands += "**/order info** - Get information for an order\n\n";
+    commands += "**/clear <number>** - Delete a specified number of messages\n\n";
 
     const embed = new EmbedBuilder()
       .setTitle("List of available commands")
