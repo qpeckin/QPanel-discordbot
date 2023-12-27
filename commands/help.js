@@ -14,6 +14,8 @@ module.exports = {
     commands += "**/order list** - Get your order list\n\n";
     commands += "**/order info** - Get information for an order\n\n";
     commands += "**/clear <number>** - Delete a specified number of messages\n\n";
+    commands += "**/imagine <prompt>** - Generate an image based on the provided text\n\n";
+    commands += "**/ask <question>** - Ask a question to the AI\n\n";
 
     const embed = new EmbedBuilder()
       .setTitle("List of available commands")

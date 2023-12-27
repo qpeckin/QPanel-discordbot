@@ -1,11 +1,12 @@
 const {
   SlashCommandBuilder,
-  EmbedBuilder,
   ButtonBuilder,
   ActionRowBuilder,
 } = require("@discordjs/builders");
 const axios = require("axios");
 const https = require("https");
+const { EmbedBuilder } = require("discord.js");
+
 
 module.exports = {
   data: new SlashCommandBuilder()

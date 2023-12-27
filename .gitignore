@@ -17,6 +17,7 @@ commands/sympa.js
 commands/insult.js
 features/aiReply.js
 commands/imagine.js
+commands/ask.js
 .vscode/*
 !.vscode/extensions.json
 .idea
