@@ -16,6 +16,7 @@ dist-ssr
 commands/sympa.js
 commands/insult.js
 features/aiReply.js
+commands/imagine.js
 .vscode/*
 !.vscode/extensions.json
 .idea
