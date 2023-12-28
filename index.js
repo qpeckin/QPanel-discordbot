@@ -51,6 +51,7 @@ LoadCommands()
 
     client.on("messageCreate", async (message) => {
       if (message.mentions.has(client.user)) {
+        message.channel.sendTyping();
         const text = message.content.replace(/<@!?\d+>/, "").trim();
         const username = message.author.username;
         const aiResponse = await GPTResponse(text, username, openaiKey);

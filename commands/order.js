@@ -55,7 +55,7 @@ module.exports = {
             let orderList = "";
 
             orders.forEach((order) => {
-              const orderInfo = `Order ID: ${order.orderId}, Media ID: ${order.mediaId}, Service: ${order.service}, Quantity: ${order.quantity}, Link: ${order.link}, Date: ${order.date}, Status: ${order.status}\n\n`;
+              const orderInfo = `-----------------\nOrder ID: ${order.orderId}\n Media ID: ${order.mediaId}\n Service: ${order.service}\n Quantity: ${order.quantity}\n Link: ${order.link}\n Date: ${order.date}\n Status: ${order.status}\n-----------------\n\n`;
 
               if (orderList.length + orderInfo.length > 2000) {
                 const embed = new EmbedBuilder()
