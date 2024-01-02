@@ -155,7 +155,6 @@ module.exports = {
             selectedService = i.customId;
 
             const unitPrice = unitPrices[selectedMedia][selectedService];
-
             axios
               .post("https://127.0.0.1:8000/api/discordCash", null, {
                 headers: {
@@ -210,7 +209,7 @@ module.exports = {
                   .setColor("#b300ff")
                   .setTitle("Link Selection")
                   .setDescription(
-                    `You have selected ${selectedQuantity}. Please provide the link in the chat.`
+                    `You have selected ${selectedQuantity} ${selectedMedia} ${selectedService}. Please provide the link in the chat.`
                   )
                   .setTimestamp(),
               ],

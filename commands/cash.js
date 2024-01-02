@@ -29,6 +29,16 @@ module.exports = {
         });
       }
 
+      const refundResponse = await axios.post(
+        "https://127.0.0.1:8000/api/checkRefund",
+        null,
+        {
+          httpsAgent: new https.Agent({
+            rejectUnauthorized: false,
+          }),
+        }
+      );
+      console.log("Refund Check: " + refundResponse.data.status);
       const response = await axios.post(
         "https://127.0.0.1:8000/api/add/discordCash",
         null,
@@ -56,7 +66,13 @@ module.exports = {
       } else if (response.data.status === 1) {
         const successEmbed = new EmbedBuilder()
           .setColor("#00ff00")
-          .setTitle("Balance: " + response.data.oldCash + "$ --> " + response.data.cash + "$")
+          .setTitle(
+            "Balance: " +
+              response.data.oldCash +
+              "$ --> " +
+              response.data.cash +
+              "$"
+          )
           .setDescription("Your balance has been successfully updated.\n");
 
         await waitMessage.edit({ embeds: [successEmbed] });
