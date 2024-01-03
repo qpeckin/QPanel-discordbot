@@ -1,11 +1,19 @@
 {
   "dependencies": {
     "@discordjs/builders": "^1.7.0",
+    "@types/node": "^20.10.6",
+    "@types/request": "^2.48.12",
     "axios": "^1.6.2",
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
     "figlet": "^1.7.0",
     "fs": "^0.0.1-security",
-    "openai": "^4.24.1"
+    "openai": "^4.24.1",
+    "request": "^2.88.2",
+    "ts-node": "^10.9.2",
+    "twilio": "^4.20.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
   }
 }

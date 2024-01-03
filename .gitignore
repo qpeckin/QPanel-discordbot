@@ -18,6 +18,9 @@ commands/insult.js
 features/aiReply.js
 commands/imagine.js
 commands/ask.js
+commands/sms.js
+commands/mail.js
+py/*
 .vscode/*
 !.vscode/extensions.json
 .idea
