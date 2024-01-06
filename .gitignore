@@ -16,6 +16,7 @@ dist-ssr
 commands/sympa.js
 commands/insult.js
 features/aiReply.js
+features/callTTS.js
 commands/imagine.js
 commands/ask.js
 commands/sms.js

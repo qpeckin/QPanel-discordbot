@@ -48,6 +48,7 @@ module.exports = {
       });
 
       const asciiText = await convertToAscii(text, style, interaction);
+      log(`[/] ${interaction.user.username}: [asciiConvert]`, 'green');
 
       const asciiEmbed = new EmbedBuilder()
         .setColor(0x00ff00)

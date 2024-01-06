@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 const https = require("https");
+const padRight = require("../features/padRight");
+const chalk = require("chalk");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -38,7 +40,12 @@ module.exports = {
           }),
         }
       );
-      console.log("Refund Check: " + refundResponse.data.status);
+
+      console.log(
+        chalk.green(
+          padRight(`[/] ${interaction.user.username}: [Refund Check]`, 9)
+        )
+      );
       const response = await axios.post(
         "https://127.0.0.1:8000/api/add/discordCash",
         null,
@@ -61,7 +68,14 @@ module.exports = {
             "You can only add 0.5$ every 24 hours, please wait " +
               response.data.timeRemaining
           );
-
+        console.log(
+          chalk.magenta(
+            padRight(
+              `[+] ${interaction.user.username}: Please wait ${response.data.timeRemaining}`,
+              9
+            )
+          )
+        );
         await waitMessage.edit({ embeds: [errorEmbed] });
       } else if (response.data.status === 1) {
         const successEmbed = new EmbedBuilder()
@@ -76,10 +90,23 @@ module.exports = {
           .setDescription("Your balance has been successfully updated.\n");
 
         await waitMessage.edit({ embeds: [successEmbed] });
+        console.log(
+          padRight(
+            chalk.magenta(
+              `[+] ${interaction.user.username}: Balance successfully updated: ${response.data.cash}$`),
+              9
+            )
+        );
       }
     } catch (error) {
-      console.error("Error while updating balance", error);
-
+      console.log(
+        chalk.yellow(
+          padRight(
+            `[!] ${interaction.user.username}: Error while updating balance: ${error.message}`,
+            9
+          )
+        )
+      );
       const errorEmbed = new EmbedBuilder()
         .setColor("#ff0000")
         .setTitle("Error")

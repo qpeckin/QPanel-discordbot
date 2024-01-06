@@ -6,7 +6,8 @@ const {
 const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 const https = require("https");
-
+const padRight = require("../features/padRight");
+const chalk = require("chalk");
 let unitPrices = null;
 
 const updatePrices = async () => {
@@ -21,17 +22,19 @@ const updatePrices = async () => {
       }
     );
     unitPrices = response.data;
+    console.log(chalk.green(padRight(`[/] [Price updating Check] `, 9)));
   } catch (error) {
-    console.error("Error updating prices:", error);
+    console.log(
+      chalk.yellow(padRight(`[!] Error updating prices:, ${error.message}`, 9))
+    );
   }
 };
-
-updatePrices();
 
 const formatPrice = (quantity, unitPrice) => {
   const price = quantity * unitPrice;
   return `${quantity} (${price.toFixed(2)}$)`;
 };
+
 const buttons = {
   instagram: new ButtonBuilder()
     .setCustomId("Instagram")
@@ -69,6 +72,7 @@ module.exports = {
 
   async execute(client, interaction) {
     try {
+      await updatePrices();
       let selectedMedia = null;
       let selectedService = null;
       let selectedQuantity = null;
@@ -124,6 +128,15 @@ module.exports = {
 
       collector.on("collect", async (i) => {
         try {
+          console.log(
+            chalk.magenta(
+              padRight(
+                `[+] ${interaction.user.username}: Button clicked: ${i.customId}`,
+                9
+              )
+            )
+          );
+
           if (
             ["Instagram", "Youtube", "Tiktok", "Twitter"].includes(i.customId)
           ) {
@@ -196,7 +209,11 @@ module.exports = {
                 });
               })
               .catch((error) => {
-                console.error("Error in Axios request:", error);
+                console.log(
+                  chalk.yellow(
+                    padRight(`[!] Error in Axios request: ${error.message}`, 9)
+                  )
+                );
               });
           } else if (
             ["100", "200", "300", "500", "1000"].includes(i.customId)
@@ -265,7 +282,14 @@ module.exports = {
                   }),
                 })
                 .then((response) => {
-                  console.log("response: " + response.data.message);
+                  console.log(
+                    chalk.magenta(
+                      padRight(
+                        `[+] ${interaction.user.username}: Response: ${response.data.message}`,
+                        9
+                      )
+                    )
+                  );
                   if (response.data.status === 1) {
                     const embed = new EmbedBuilder()
                       .setColor("#b300ff")
@@ -280,8 +304,15 @@ module.exports = {
                       components: [],
                     });
                   } else if (response.data.status === 2) {
-                    console.log("response: " + response.data.a);
-                    console.log("response: " + response.data.b);
+                    console.log(
+                      chalk.magenta(
+                        padRight(
+                          `[!] Error: ${response.data.a}\n${response.data.b}`,
+                          9
+                        )
+                      )
+                    );
+
                     const embed = new EmbedBuilder()
                       .setColor("#ff0000")
                       .setTitle("Error")
@@ -290,27 +321,70 @@ module.exports = {
                   }
                 })
                 .catch((error) => {
-                  console.error("Error in Axios request:", error);
+                  console.log(
+                    chalk.yellow(
+                      padRight(
+                        `[!] Error in Axios request: ${error.message}`,
+                        9
+                      )
+                    )
+                  );
+
                   let errorMessage =
                     "An error occurred while processing your request.";
 
                   if (error.response) {
-                    console.error("Response data:", error.response.data);
-                    console.error("Response status:", error.response.status);
-                    console.error("Response headers:", error.response.headers);
+                    console.error(
+                      chalk.red(
+                        padRight(
+                          `[+] Response data: ${JSON.stringify(
+                            error.response.data
+                          )}`,
+                          9
+                        )
+                      )
+                    );
+                    console.error(
+                      chalk.red(
+                        padRight(
+                          `[+] Response status: ${error.response.status}`,
+                          9
+                        )
+                      )
+                    );
+                    console.error(
+                      chalk.red(
+                        padRight(
+                          `[+] Response headers: ${JSON.stringify(
+                            error.response.headers
+                          )}`,
+                          9
+                        )
+                      )
+                    );
 
                     if (error.response.data && error.response.data.message) {
                       errorMessage = error.response.data.message;
                     }
                   } else if (error.request) {
                     console.error(
-                      "No response received. Request details:",
-                      error.request
+                      chalk.yellow(
+                        padRight(
+                          `[+] No response received. Request details: ${JSON.stringify(
+                            error.request
+                          )}`,
+                          9
+                        )
+                      )
                     );
                   } else {
                     console.error(
-                      "Error setting up the request:",
-                      error.message
+                      chalk.yellow(
+                        padRight(
+                          `[+] Error setting up the request: ${error.message}`,
+                          9
+                        )
+                      )
                     );
                   }
 
@@ -337,11 +411,23 @@ module.exports = {
                   embeds: [timeoutEmbed],
                   ephemeral: true,
                 });
+                console.log(
+                  chalk.magenta(
+                    padRight(`[+] ${interaction.user.username}: Timeout`, 9)
+                  )
+                );
               }
             });
           }
         } catch (error) {
-          console.error("Error in interaction collector:", error);
+          console.log(
+            chalk.yellow(
+              padRight(
+                `[!] Error in interaction collector: ${error.message}`,
+                9
+              )
+            )
+          );
 
           const errorEmbed = new EmbedBuilder()
             .setColor("#ff0000")
@@ -352,7 +438,12 @@ module.exports = {
         }
       });
     } catch (error) {
-      console.error("Error in execute function:", error);
+      console.error(
+        padToCenter(
+          `[!] Error in execute function: ${error.message}`.split("\n"),
+          process.stdout.columns
+        )
+      );
 
       const errorEmbed = new EmbedBuilder()
         .setColor("#ff0000")
