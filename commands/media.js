@@ -7,6 +7,7 @@ const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 const https = require("https");
 const padRight = require("../features/padRight");
+const padToCenter = require("../features/padToCenter");
 const chalk = require("chalk");
 let unitPrices = null;
 

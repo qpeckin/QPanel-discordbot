@@ -67,7 +67,6 @@ module.exports = {
           await interaction.editReply({ embeds: [embed] });
           console.log(chalk.green(padRight(`[/] [Sms Tokens Buy] `, 9)));
         }
-        console.log(response);
       } catch (error) {
         console.log(
           chalk.yellow(padRight(`[!] Error buying SMS tokens:, ${error}`, 9))

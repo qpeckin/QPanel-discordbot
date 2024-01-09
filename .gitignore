@@ -13,14 +13,17 @@ dist-ssr
 *.local
 # Editor directories and files
 .env
-commands/sympa.js
-commands/insult.js
 features/aiReply.js
 features/callTTS.js
 commands/imagine.js
+commands/verify-sms.js
+commands/tts.js
+commands/insult.js
+commands/sympa.js
+commands/mail.js
 commands/ask.js
 commands/sms.js
-commands/mail.js
+operation.mp3
 py/*
 .vscode/*
 !.vscode/extensions.json
